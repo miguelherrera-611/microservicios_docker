@@ -1,0 +1,33 @@
+# Configuración específica para el entorno de desarrollo
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gaming-api-gateway
+
+  # Configuración específica de desarrollo
+  cloud:
+    gateway:
+      # En desarrollo, habilitamos logs más detallados
+      httpclient:
+        wiretap: true
+
+# Logging más detallado para desarrollo
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+    org.springframework.cloud.gateway.filter: DEBUG
+    org.springframework.cloud.gateway.route: DEBUG
+    com.gaming.gateway: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Información adicional para desarrollo
+info:
+  app:
+    name: Gaming API Gateway
+    description: Gateway para microservicios de videojuegos - Desarrollo
+    version: 1.0.0-DEV
+    environment: development

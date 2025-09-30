@@ -1,0 +1,62 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gaming-api-gateway
+
+  cloud:
+    gateway:
+      # Configuración global de CORS
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      # Configuración de descubrimiento de servicios (deshabilitado para usar URLs directas)
+      discovery:
+        locator:
+          enabled: false
+
+      # Configuración de timeout
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 10000
+
+# Configuración de Actuator para monitoreo
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,routes
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+# Configuración de logging
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    com.gaming.gateway: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Información de la aplicación
+info:
+  app:
+    name: Gaming API Gateway
+    description: Gateway para microservicios de videojuegos
+    version: 1.0.0

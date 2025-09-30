@@ -1,0 +1,51 @@
+# Configuración específica para el entorno de desarrollo
+server:
+  port: 8083
+
+spring:
+  application:
+    name: gaming-review-service-dev
+
+  # Configuración de R2DBC para desarrollo
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5434/reviewdb
+    username: gameapp
+    password: password123
+    pool:
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 15m
+      validation-query: SELECT 1
+
+# Logging más detallado para desarrollo
+logging:
+  level:
+    com.gaming.reviewservice: DEBUG
+    org.springframework.r2dbc: DEBUG
+    io.r2dbc.postgresql: DEBUG
+    org.springframework.data.r2dbc: DEBUG
+    org.springframework.web.reactive: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Configuración de Actuator para desarrollo
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    loggers:
+      enabled: true
+
+# Información adicional para desarrollo
+info:
+  app:
+    name: Gaming Review Service
+    description: Microservicio reactivo para gestión de reseñas - Desarrollo
+    version: 1.0.0-DEV
+    environment: development
+    database: reviewdb
+    port: 8083
