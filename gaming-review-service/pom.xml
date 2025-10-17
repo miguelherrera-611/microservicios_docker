@@ -12,7 +12,7 @@
     <groupId>com.gaming.reviewservice</groupId>
     <artifactId>gaming-review-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <n>gaming-review-service</n>
+    <name>gaming-review-service</name>
     <description>Review Service for Gaming Microservices - Reactive Review Management</description>
 
     <properties>

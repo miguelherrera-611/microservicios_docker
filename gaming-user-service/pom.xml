@@ -12,7 +12,7 @@
     <groupId>com.gaming.userservice</groupId>
     <artifactId>gaming-user-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <n>gaming-user-service</n>
+    <name>gaming-user-service</name>
     <description>User Service for Gaming Microservices - Reactive User Management</description>
 
     <properties>
