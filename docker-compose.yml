@@ -1,0 +1,195 @@
+version: '3.8'
+
+services:
+  # ==================== BASES DE DATOS ====================
+
+  gamedb:
+    image: postgres:15-alpine
+    container_name: gaming-gamedb
+    restart: always
+    environment:
+      POSTGRES_DB: gamedb
+      POSTGRES_USER: gameapp
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - gamedb_data:/var/lib/postgresql/data
+    networks:
+      - gaming-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gameapp -d gamedb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  userdb:
+    image: postgres:15-alpine
+    container_name: gaming-userdb
+    restart: always
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: gameapp
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5433:5432"
+    volumes:
+      - userdb_data:/var/lib/postgresql/data
+    networks:
+      - gaming-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gameapp -d userdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  reviewdb:
+    image: postgres:15-alpine
+    container_name: gaming-reviewdb
+    restart: always
+    environment:
+      POSTGRES_DB: reviewdb
+      POSTGRES_USER: gameapp
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5434:5432"
+    volumes:
+      - reviewdb_data:/var/lib/postgresql/data
+    networks:
+      - gaming-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gameapp -d reviewdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== MICROSERVICIOS ====================
+
+  game-service:
+    build:
+      context: ./gaming-game-service
+      dockerfile: Dockerfile
+    container_name: gaming-game-service
+    restart: always
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://gamedb:5432/gamedb
+      SPRING_R2DBC_USERNAME: gameapp
+      SPRING_R2DBC_PASSWORD: password123
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081"
+    networks:
+      - gaming-network
+    depends_on:
+      gamedb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  user-service:
+    build:
+      context: ./gaming-user-service
+      dockerfile: Dockerfile
+    container_name: gaming-user-service
+    restart: always
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://userdb:5432/userdb
+      SPRING_R2DBC_USERNAME: gameapp
+      SPRING_R2DBC_PASSWORD: password123
+      SERVER_PORT: 8082
+    ports:
+      - "8082:8082"
+    networks:
+      - gaming-network
+    depends_on:
+      userdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  review-service:
+    build:
+      context: ./gaming-review-service
+      dockerfile: Dockerfile
+    container_name: gaming-review-service
+    restart: always
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://reviewdb:5432/reviewdb
+      SPRING_R2DBC_USERNAME: gameapp
+      SPRING_R2DBC_PASSWORD: password123
+      SERVER_PORT: 8083
+    ports:
+      - "8083:8083"
+    networks:
+      - gaming-network
+    depends_on:
+      reviewdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== API GATEWAY ====================
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gaming-api-gateway
+    restart: always
+    environment:
+      SERVER_PORT: 8080
+      GAME_SERVICE_URL: http://game-service:8081
+      USER_SERVICE_URL: http://user-service:8082
+      REVIEW_SERVICE_URL: http://review-service:8083
+    ports:
+      - "8080:8080"
+    networks:
+      - gaming-network
+    depends_on:
+      - game-service
+      - user-service
+      - review-service
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== PGADMIN ====================
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: gaming-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gaming.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8090:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - gaming-network
+    depends_on:
+      - gamedb
+      - userdb
+      - reviewdb
+
+volumes:
+  gamedb_data:
+  userdb_data:
+  reviewdb_data:
+  pgadmin_data:
+
+networks:
+  gaming-network:
+    driver: bridge
