@@ -1,5 +1,6 @@
 package com.gaming.gateway.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -11,30 +12,39 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 public class GatewayConfig {
 
+    @Value("${GAME_SERVICE_URL:http://localhost:8081}")
+    private String gameServiceUrl;
+
+    @Value("${USER_SERVICE_URL:http://localhost:8082}")
+    private String userServiceUrl;
+
+    @Value("${REVIEW_SERVICE_URL:http://localhost:8083}")
+    private String reviewServiceUrl;
+
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                // Game Service Routes - Todas las rutas relacionadas con juegos
+                // Game Service Routes
                 .route("game-service", r -> r.path("/api/games/**")
-                        .uri("http://localhost:8081"))
+                        .uri(gameServiceUrl))
 
-                // User Service Routes - Todas las rutas relacionadas con usuarios
+                // User Service Routes
                 .route("user-service", r -> r.path("/api/users/**")
-                        .uri("http://localhost:8082"))
+                        .uri(userServiceUrl))
 
-                // Review Service Routes - Todas las rutas relacionadas con reseñas
+                // Review Service Routes
                 .route("review-service", r -> r.path("/api/reviews/**")
-                        .uri("http://localhost:8083"))
+                        .uri(reviewServiceUrl))
 
-                // Health checks para cada servicio
+                // Health checks
                 .route("game-service-health", r -> r.path("/health/games")
-                        .uri("http://localhost:8081/actuator/health"))
+                        .uri(gameServiceUrl + "/actuator/health"))
 
                 .route("user-service-health", r -> r.path("/health/users")
-                        .uri("http://localhost:8082/actuator/health"))
+                        .uri(userServiceUrl + "/actuator/health"))
 
                 .route("review-service-health", r -> r.path("/health/reviews")
-                        .uri("http://localhost:8083/actuator/health"))
+                        .uri(reviewServiceUrl + "/actuator/health"))
 
                 .build();
     }
@@ -43,7 +53,7 @@ public class GatewayConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowCredentials(true);
-        corsConfig.addAllowedOriginPattern("*"); // En producción, especifica dominios exactos
+        corsConfig.addAllowedOriginPattern("*");
         corsConfig.addAllowedHeader("*");
         corsConfig.addAllowedMethod("*");
 
