@@ -7,7 +7,7 @@ spring:
 
   cloud:
     gateway:
-      # Configuración global de CORS
+      # Configuraciï¿½n global de CORS
       globalcors:
         cors-configurations:
           '[/**]':
@@ -23,17 +23,17 @@ spring:
             allowCredentials: true
             maxAge: 3600
 
-      # Configuración de descubrimiento de servicios (deshabilitado para usar URLs directas)
+      # Configuraciï¿½n de descubrimiento de servicios (deshabilitado para usar URLs directas)
       discovery:
         locator:
           enabled: false
 
-      # Configuración de timeout
+      # Configuraciï¿½n de timeout
       httpclient:
         connect-timeout: 5000
         response-timeout: 10000
 
-# Configuración de Actuator para monitoreo
+# Configuraciï¿½n de Actuator para monitoreo
 management:
   endpoints:
     web:
@@ -45,7 +45,7 @@ management:
     gateway:
       enabled: true
 
-# Configuración de logging
+# Configuraciï¿½n de logging
 logging:
   level:
     org.springframework.cloud.gateway: INFO
@@ -54,7 +54,7 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# Información de la aplicación
+# Informaciï¿½n de la aplicaciï¿½n
 info:
   app:
     name: Gaming API Gateway
