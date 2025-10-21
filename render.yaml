@@ -1,0 +1,88 @@
+services:
+  # API Gateway
+  - type: web
+    name: gaming-api-gateway
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: GAME_SERVICE_URL
+        value: http://gaming-game-service:8081
+      - key: USER_SERVICE_URL
+        value: http://gaming-user-service:8082
+      - key: REVIEW_SERVICE_URL
+        value: http://gaming-review-service:8083
+
+  # Game Service
+  - type: web
+    name: gaming-game-service
+    env: docker
+    dockerfilePath: ./gaming-game-service/Dockerfile
+    dockerContext: ./gaming-game-service
+    plan: free
+    envVars:
+      - key: SPRING_R2DBC_URL
+        fromDatabase:
+          name: gamedb
+          property: connectionString
+      - key: SPRING_R2DBC_USERNAME
+        value: gameapp
+      - key: SPRING_R2DBC_PASSWORD
+        fromDatabase:
+          name: gamedb
+          property: password
+
+  # User Service
+  - type: web
+    name: gaming-user-service
+    env: docker
+    dockerfilePath: ./gaming-user-service/Dockerfile
+    dockerContext: ./gaming-user-service
+    plan: free
+    envVars:
+      - key: SPRING_R2DBC_URL
+        fromDatabase:
+          name: userdb
+          property: connectionString
+      - key: SPRING_R2DBC_USERNAME
+        value: gameapp
+      - key: SPRING_R2DBC_PASSWORD
+        fromDatabase:
+          name: userdb
+          property: password
+
+  # Review Service
+  - type: web
+    name: gaming-review-service
+    env: docker
+    dockerfilePath: ./gaming-review-service/Dockerfile
+    dockerContext: ./gaming-review-service
+    plan: free
+    envVars:
+      - key: SPRING_R2DBC_URL
+        fromDatabase:
+          name: reviewdb
+          property: connectionString
+      - key: SPRING_R2DBC_USERNAME
+        value: gameapp
+      - key: SPRING_R2DBC_PASSWORD
+        fromDatabase:
+          name: reviewdb
+          property: password
+
+databases:
+  - name: gamedb
+    databaseName: gamedb
+    user: gameapp
+    plan: free
+
+  - name: userdb
+    databaseName: userdb
+    user: gameapp
+    plan: free
+
+  - name: reviewdb
+    databaseName: reviewdb
+    user: gameapp
+    plan: free
