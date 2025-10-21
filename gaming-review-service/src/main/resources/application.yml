@@ -5,24 +5,41 @@ spring:
   application:
     name: gaming-review-service
 
-  # Configuración de R2DBC (base de datos reactiva)
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      discovery:
+        locator:
+          enabled: false
+
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 10000
+
   r2dbc:
-    url: r2dbc:postgresql://localhost:5434/reviewdb
+    url: r2dbc:postgresql://reviewdb:5432/reviewdb
     username: gameapp
     password: password123
     pool:
-      initial-size: 10
-      max-size: 20
-      max-idle-time: 30m
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 15m
       validation-query: SELECT 1
 
-  # Configuración para mostrar SQL en logs (desarrollo)
-  logging:
-    level:
-      org.springframework.r2dbc: DEBUG
-      io.r2dbc.postgresql.QUERY: DEBUG
-
-# Configuración de Actuator para monitoreo
 management:
   endpoints:
     web:
@@ -32,17 +49,16 @@ management:
     health:
       show-details: always
 
-# Configuración de logging
 logging:
   level:
-    com.gaming.reviewservice: DEBUG
-    org.springframework.data.r2dbc: INFO
+    com.gaming.reviewservice: INFO
+    org.springframework.r2dbc: INFO
+    org.springframework.web: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# Información de la aplicación
 info:
   app:
     name: Gaming Review Service
-    description: Microservicio reactivo para gestión de reseñas
+    description: Microservicio para gestion de resenas de videojuegos
     version: 1.0.0

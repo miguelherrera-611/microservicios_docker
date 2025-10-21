@@ -5,24 +5,16 @@ spring:
   application:
     name: gaming-user-service
 
-  # Configuración de R2DBC (base de datos reactiva)
   r2dbc:
-    url: r2dbc:postgresql://localhost:5433/userdb
+    url: r2dbc:postgresql://userdb:5432/userdb
     username: gameapp
     password: password123
     pool:
-      initial-size: 10
-      max-size: 20
-      max-idle-time: 30m
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 15m
       validation-query: SELECT 1
 
-  # Configuración para mostrar SQL en logs (desarrollo)
-  logging:
-    level:
-      org.springframework.r2dbc: DEBUG
-      io.r2dbc.postgresql.QUERY: DEBUG
-
-# Configuración de Actuator para monitoreo
 management:
   endpoints:
     web:
@@ -32,17 +24,15 @@ management:
     health:
       show-details: always
 
-# Configuración de logging
 logging:
   level:
-    com.gaming.userservice: DEBUG
-    org.springframework.data.r2dbc: INFO
+    com.gaming.userservice: INFO
+    org.springframework.r2dbc: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# Información de la aplicación
 info:
   app:
     name: Gaming User Service
-    description: Microservicio reactivo para gestión de usuarios
+    description: Microservicio para gestion de usuarios
     version: 1.0.0

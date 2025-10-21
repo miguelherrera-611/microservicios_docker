@@ -1,10 +1,24 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN apk add --no-cache maven
-RUN mvn clean package -DskipTests
 
+# Copiar archivos de Maven wrapper
+COPY .mvn .mvn
+COPY mvnw .
+COPY pom.xml .
+
+# Dar permisos de ejecución al wrapper
+RUN chmod +x mvnw
+
+# Descargar dependencias (capa cacheada)
+RUN ./mvnw dependency:go-offline -B
+
+# Copiar código fuente
+COPY src ./src
+
+# Compilar la aplicación
+RUN ./mvnw clean package -DskipTests
+
+# Etapa de ejecución
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
