@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # ==================== BASES DE DATOS ====================
+  gamedb:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: gamedb
+      POSTGRES_USER: gameapp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password123}
+    volumes:
+      - gamedb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gameapp -d gamedb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  userdb:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: gameapp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password123}
+    volumes:
+      - userdb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gameapp -d userdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  reviewdb:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: reviewdb
+      POSTGRES_USER: gameapp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password123}
+    volumes:
+      - reviewdb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gameapp -d reviewdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== MICROSERVICIOS ====================
+  game-service:
+    build:
+      context: ./gaming-game-service
+    restart: always
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://gamedb:5432/gamedb
+      SPRING_R2DBC_USERNAME: gameapp
+      SPRING_R2DBC_PASSWORD: ${POSTGRES_PASSWORD:-password123}
+    depends_on:
+      gamedb:
+        condition: service_healthy
+
+  user-service:
+    build:
+      context: ./gaming-user-service
+    restart: always
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://userdb:5432/userdb
+      SPRING_R2DBC_USERNAME: gameapp
+      SPRING_R2DBC_PASSWORD: ${POSTGRES_PASSWORD:-password123}
+    depends_on:
+      userdb:
+        condition: service_healthy
+
+  review-service:
+    build:
+      context: ./gaming-review-service
+    restart: always
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://reviewdb:5432/reviewdb
+      SPRING_R2DBC_USERNAME: gameapp
+      SPRING_R2DBC_PASSWORD: ${POSTGRES_PASSWORD:-password123}
+    depends_on:
+      reviewdb:
+        condition: service_healthy
+
+  # ==================== API GATEWAY ====================
+  api-gateway:
+    build:
+      context: .
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      GAME_SERVICE_URL: http://game-service:8081
+      USER_SERVICE_URL: http://user-service:8082
+      REVIEW_SERVICE_URL: http://review-service:8083
+    depends_on:
+      - game-service
+      - user-service
+      - review-service
+
+volumes:
+  gamedb_data:
+  userdb_data:
+  reviewdb_data:
