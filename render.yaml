@@ -5,14 +5,18 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    plan: free
+    plan: starter
+    autoDeploy: true
+    healthCheckPath: /actuator/health
     envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
       - key: GAME_SERVICE_URL
-        value: http://gaming-game-service:8081
+        value: https://gaming-game-service.onrender.com
       - key: USER_SERVICE_URL
-        value: http://gaming-user-service:8082
+        value: https://gaming-user-service.onrender.com
       - key: REVIEW_SERVICE_URL
-        value: http://gaming-review-service:8083
+        value: https://gaming-review-service.onrender.com
 
   # Game Service
   - type: web
@@ -20,14 +24,30 @@ services:
     env: docker
     dockerfilePath: ./gaming-game-service/Dockerfile
     dockerContext: ./gaming-game-service
-    plan: free
+    plan: starter
+    autoDeploy: true
+    healthCheckPath: /actuator/health
     envVars:
-      - key: SPRING_R2DBC_URL
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_INITIALIZE
+        value: "false"
+      - key: SPRING_R2DBC_HOST
         fromDatabase:
           name: gamedb
-          property: connectionString
+          property: host
+      - key: SPRING_R2DBC_PORT
+        fromDatabase:
+          name: gamedb
+          property: port
+      - key: SPRING_R2DBC_DATABASE
+        fromDatabase:
+          name: gamedb
+          property: database
       - key: SPRING_R2DBC_USERNAME
-        value: gameapp
+        fromDatabase:
+          name: gamedb
+          property: user
       - key: SPRING_R2DBC_PASSWORD
         fromDatabase:
           name: gamedb
@@ -39,14 +59,30 @@ services:
     env: docker
     dockerfilePath: ./gaming-user-service/Dockerfile
     dockerContext: ./gaming-user-service
-    plan: free
+    plan: starter
+    autoDeploy: true
+    healthCheckPath: /actuator/health
     envVars:
-      - key: SPRING_R2DBC_URL
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_INITIALIZE
+        value: "false"
+      - key: SPRING_R2DBC_HOST
         fromDatabase:
           name: userdb
-          property: connectionString
+          property: host
+      - key: SPRING_R2DBC_PORT
+        fromDatabase:
+          name: userdb
+          property: port
+      - key: SPRING_R2DBC_DATABASE
+        fromDatabase:
+          name: userdb
+          property: database
       - key: SPRING_R2DBC_USERNAME
-        value: gameapp
+        fromDatabase:
+          name: userdb
+          property: user
       - key: SPRING_R2DBC_PASSWORD
         fromDatabase:
           name: userdb
@@ -58,14 +94,30 @@ services:
     env: docker
     dockerfilePath: ./gaming-review-service/Dockerfile
     dockerContext: ./gaming-review-service
-    plan: free
+    plan: starter
+    autoDeploy: true
+    healthCheckPath: /actuator/health
     envVars:
-      - key: SPRING_R2DBC_URL
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_INITIALIZE
+        value: "false"
+      - key: SPRING_R2DBC_HOST
         fromDatabase:
           name: reviewdb
-          property: connectionString
+          property: host
+      - key: SPRING_R2DBC_PORT
+        fromDatabase:
+          name: reviewdb
+          property: port
+      - key: SPRING_R2DBC_DATABASE
+        fromDatabase:
+          name: reviewdb
+          property: database
       - key: SPRING_R2DBC_USERNAME
-        value: gameapp
+        fromDatabase:
+          name: reviewdb
+          property: user
       - key: SPRING_R2DBC_PASSWORD
         fromDatabase:
           name: reviewdb
@@ -75,14 +127,14 @@ databases:
   - name: gamedb
     databaseName: gamedb
     user: gameapp
-    plan: free
+    plan: starter
 
   - name: userdb
     databaseName: userdb
     user: gameapp
-    plan: free
+    plan: starter
 
   - name: reviewdb
     databaseName: reviewdb
     user: gameapp
-    plan: free
+    plan: starter
