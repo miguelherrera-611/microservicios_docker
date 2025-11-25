@@ -49,3 +49,6 @@ info:
     environment: development
     database: gamedb
     port: 8081
+
+database:
+  initialize: true

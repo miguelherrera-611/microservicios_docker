@@ -6,14 +6,18 @@ spring:
     name: gaming-user-service
 
   r2dbc:
-    url: r2dbc:postgresql://userdb:5432/userdb
-    username: gameapp
-    password: password123
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://${SPRING_R2DBC_HOST:${POSTGRES_HOST:localhost}}:${SPRING_R2DBC_PORT:${POSTGRES_PORT:5432}}/${SPRING_R2DBC_DATABASE:${POSTGRES_DB:userdb}}}
+    username: ${SPRING_R2DBC_USERNAME:${POSTGRES_USER:gameapp}}
+    password: ${SPRING_R2DBC_PASSWORD:${POSTGRES_PASSWORD:password123}}
     pool:
       initial-size: 5
       max-size: 10
       max-idle-time: 15m
       validation-query: SELECT 1
+
+  database:
+    initialize: ${DATABASE_INITIALIZE:false}
+    schema-location: ${DATABASE_SCHEMA_LOCATION:schema.sql}
 
 management:
   endpoints:

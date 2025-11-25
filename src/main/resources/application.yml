@@ -30,6 +30,15 @@ spring:
         connect-timeout: 5000
         response-timeout: 10000
 
+# URLs de servicios - Por defecto apuntan a localhost para desarrollo en IntelliJ
+services:
+  game:
+    url: ${GAME_SERVICE_URL:http://localhost:8081}
+  user:
+    url: ${USER_SERVICE_URL:http://localhost:8082}
+  review:
+    url: ${REVIEW_SERVICE_URL:http://localhost:8083}
+
 management:
   endpoints:
     web:
@@ -44,13 +53,14 @@ management:
 logging:
   level:
     org.springframework.cloud.gateway: INFO
-    com.gaming.gateway: DEBUG
-    org.springframework.web: DEBUG
+    com.gaming.gateway: INFO
+    org.springframework.web: INFO
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
 
 info:
   app:
     name: Gaming API Gateway
     description: Gateway para microservicios de videojuegos
     version: 1.0.0
+    profiles: ${spring.profiles.active:default}

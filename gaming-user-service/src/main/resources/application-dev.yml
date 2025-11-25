@@ -49,3 +49,6 @@ info:
     environment: development
     database: userdb
     port: 8082
+
+database:
+  initialize: true

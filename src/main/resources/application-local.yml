@@ -1,0 +1,73 @@
+# Perfil para desarrollo local en IntelliJ
+# Activar con: -Dspring.profiles.active=local
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gaming-api-gateway
+
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      httpclient:
+        wiretap: true
+        connect-timeout: 10000
+        response-timeout: 30000
+
+# URLs para desarrollo local (servicios corriendo individualmente)
+game:
+  service:
+    url: http://localhost:8081
+
+user:
+  service:
+    url: http://localhost:8082
+
+review:
+  service:
+    url: http://localhost:8083
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+    org.springframework.cloud.gateway.filter: DEBUG
+    org.springframework.cloud.gateway.route: DEBUG
+    com.gaming.gateway: DEBUG
+    reactor.netty: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+info:
+  app:
+    name: Gaming API Gateway
+    description: Gateway para microservicios de videojuegos - LOCAL
+    version: 1.0.0-DEV
+    environment: local

@@ -1,24 +1,27 @@
 package com.gaming.gameservice.config;
 
 import io.r2dbc.spi.ConnectionFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 
 @Configuration
+@EnableConfigurationProperties(DatabaseProperties.class)
 public class DatabaseConfig {
 
     @Bean
-    public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
+    @ConditionalOnProperty(prefix = "spring.database", name = "initialize", havingValue = "true")
+    public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory, DatabaseProperties databaseProperties) {
         ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
         initializer.setConnectionFactory(connectionFactory);
 
-        // Ejecutar script SQL para crear tablas
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
-                new ClassPathResource("schema.sql")
+                new ClassPathResource(databaseProperties.getSchemaLocation())
         );
         initializer.setDatabasePopulator(populator);
 
