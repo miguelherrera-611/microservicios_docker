@@ -6,7 +6,7 @@ spring:
     name: gaming-review-service
 
   r2dbc:
-    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://${SPRING_R2DBC_HOST:${POSTGRES_HOST:localhost}}:${SPRING_R2DBC_PORT:${POSTGRES_PORT:5432}}/${SPRING_R2DBC_DATABASE:${POSTGRES_DB:reviewdb}}}
+    url: r2dbc:postgresql://${SPRING_R2DBC_HOST:${POSTGRES_HOST:localhost}}:${SPRING_R2DBC_PORT:${POSTGRES_PORT:5432}}/${SPRING_R2DBC_DATABASE:${POSTGRES_DB:reviewdb}}}
     username: ${SPRING_R2DBC_USERNAME:${POSTGRES_USER:gameapp}}
     password: ${SPRING_R2DBC_PASSWORD:${POSTGRES_PASSWORD:password123}}
     pool:
